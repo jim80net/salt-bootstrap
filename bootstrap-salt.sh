@@ -2170,7 +2170,7 @@ install_smartos_deps() {
         tar -xvf zeromq-${ZEROMQ_VERSION}.tar.gz
     )
     cd zeromq-${ZEROMQ_VERSION}
-    ./configure || return 1
+    ./configure --prefix /opt/local || return 1
     make || return 1
     make install || return 1
 
