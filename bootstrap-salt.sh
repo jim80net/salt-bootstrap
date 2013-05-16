@@ -2125,6 +2125,43 @@ install_smartos_deps() {
     check_pip_allowed
     echowarn "PyZMQ will be installed using pip"
 
+	# Check for pkgin
+	if which pkgin 1>/dev/null; then
+		donothing=donothing
+	else
+		echo "Installing pkgin"
+		cd /
+		curl -k http://pkgsrc.joyent.com/sdc6/2012Q2/x86_64/bootstrap.tar.gz | gzcat | tar -xf -
+		pkg_admin rebuild
+		pkgin -y up || return 1
+	fi
+
+	# Check for gcc
+	if which gcc 1> /dev/null; then 
+		donothing=donothing
+	else
+		echo "Looking for gcc"
+		for each in /opt/local/gcc47/bin; do
+			if [ -f ${each}/gcc ]; then
+				sed -i\.bac  \\\,\^PATH\,s\,\$\,\:${each}\, ~/.profile && source ~/.profile
+			fi
+		done
+	fi
+
+	if which make 1> /dev/null; then 
+		donothing=donothing
+	else
+		echo "Looking for make"
+		for each in /opt/local/gnu/bin; do
+			if [ -f ${each}/make ]; then
+				sed -i\.bac  \\\,\^PATH\,s\,\$\,\:${each}\, ~/.profile && source ~/.profile
+			fi
+		done
+	fi
+
+	# Do this in /tmp
+	cd /tmp
+
     ZEROMQ_VERSION='3.2.2'
     pkgin -y in libtool-base autoconf automake libuuid gcc-compiler gmake \
         python27 py27-pip py27-setuptools py27-yaml py27-crypto swig || return 1
